@@ -3,18 +3,27 @@
 
 import React from "react";
 import ReactDOM from "react-dom";
+
+import { Provider } from 'react-redux';
+import { PersistGate } from 'redux-persist/integration/react'
+import { Loader, Dimmer } from 'semantic-ui-react'
+
+import { store, persistor } from './redux/store';
+
 import "./index.scss";
 import App from "./components";
-import io from "socket.io-client";
+import { connect } from './socket/Events';
 
-ReactDOM.render(<App />, document.getElementById("root"));
+connect();
 
-
-//connecting to Socket.IO chat server
-const socket = io("https://spotim-demo-chat-server.herokuapp.com");
-socket.on("connect", function() {
-  console.log("connected to chat server!");
-});
-socket.on("disconnect", function() {
-  console.log("disconnected from chat server!");
-});
+ReactDOM.render(
+  <Provider store={store}>
+    <PersistGate loading={
+      <Dimmer active>
+        <Loader />
+      </Dimmer>
+    } persistor={persistor}>
+      <App />
+    </PersistGate>
+  </Provider>
+  , document.getElementById("root"));
